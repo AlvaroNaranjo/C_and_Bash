@@ -1,0 +1,64 @@
+#!/bin/sh
+
+#1.Syntax Check
+if [ "$#" -ne 1 -a "$1" != "-f" ] || [ "$#" -ne 1 -a "$#" -ne 3 ]
+then
+        echo Syntax Error: invalid arguments supplied. Revise option, file and target.
+        exit 1
+fi
+
+#2.Command Parsing
+#2.1 Extract rules specifying target from command line arguments.
+#If rules file does not exist print error message and exit with non zero status
+if [ "$#" -eq 3 ]
+then
+        rules=$2
+        target=$3
+	if [ ! -e $rules ]
+	then
+		echo Input Error: file $rules does not exist.
+		exit 1
+	fi
+else
+        mymk -f makefile $1
+        exit 0
+fi
+
+#2.2 Parse lines blockwise if header for target found in rules.
+#0 for success of variables: exists, sawheader and newer.
+[ -e $target ]
+exists=$?
+sawheader=1
+newer=1
+while read line        
+do
+#parse block header
+if [ `expr "$line" : "\<$target : "` -ne 0 ]
+then
+        sawheader=0
+        deps=${line##"$target : "}
+        #update dependencies
+        for dep in $deps
+        do
+                mymk -f $rules $dep
+                #check for newer dependencies.
+                [ $dep -nt $target ]
+                newer=`expr $newer \* $?`
+        done
+#parse block actions until hitting newline as long as header was seen 
+#and target does not exist or there is a newer dependancy
+elif [ $exists -ne 0 -o $newer -eq 0 ] && [ $sawheader -eq 0 -a -n "$line" ]
+then
+        eval $line
+#block delimiter is \n. Use it to stop updating actions of previous block.
+elif [ -z "$line" ]
+then
+        sawheader=1
+        newer=1
+fi
+done < $rules
+
+#3.Parsing through rules complete. Target was updated. 
+#If no rule for target was found nothing was done.
+exit 0
+
