@@ -5,7 +5,7 @@ buxfer: transactions_manager.o lists.o lists.h
 	$(CC) $(CFLAGS) -o transactions_manager buxfer.o lists.o
 
 buxfer.o: transactions_manager.c lists.h
-	$(CC) $(CFLAGS) -c buxfer.c
+	$(CC) $(CFLAGS) -c transaction_manager.c
 
 lists.o: lists.c lists.h
 	$(CC) $(CFLAGS) -c lists.c

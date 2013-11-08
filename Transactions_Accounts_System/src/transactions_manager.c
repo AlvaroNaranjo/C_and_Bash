@@ -14,7 +14,7 @@ void error(const char *msg) {
 }
 
 /* 
- * Read and process buxfer commands
+ * Read and process transaction_manager commands
  */
 int process_args(int cmd_argc, char **cmd_argv, Group **group_list_addr) {
     Group *group_list = *group_list_addr; 
@@ -131,7 +131,7 @@ int main(int argc, char* argv[]) {
         input_stream = stdin;
     }
 
-    printf("Welcome to Buxfer!\nPlease input command:\n>");
+    printf("Welcome to Transaction_Manager!\nPlease input command:\n>");
     
     while (fgets(input, INPUT_BUFFER_SIZE, input_stream) != NULL) {
         /* Echo line if in batch mode */
